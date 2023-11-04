@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AuraTween;
@@ -7,17 +8,27 @@ using CrossyRoad.World;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 namespace CrossyRoad.Player
 {
     public class PlayerController : MonoBehaviour, CrossyRoadInput.IPlayerInputActions
     {
+        // kinda gross but it's gonna take too long to do this nice lol
+        public static Action? KillPlayer;
+        
         [SerializeField]
         private Animator _playerAnimator = null!;
+        
+        [SerializeField]
+        private Animator _rendererAnimator = null!;
 
         [SerializeField]
         private Transform _playerTransform = null!;
         
+        [SerializeField]
+        private GameObject _explosion = null!;
+
         [SerializeField]
         private TweenManager _tweenManager = null!;
         
@@ -34,9 +45,12 @@ namespace CrossyRoad.Player
 
         private CrossyRoadInput _input = null!;
         private bool _jumping = false;
+        private bool _dead = false;
         private int _currentTile = 0;
         
         private int _jumpTriggerId = Animator.StringToHash("Jump");
+        private int _deathTriggerId = Animator.StringToHash("Death");
+
         private int _finishJumpTriggerId = Animator.StringToHash("FinishMoving");
         private int _jumpAnimationId = Animator.StringToHash("Move");
         // Start is called before the first frame update
@@ -44,6 +58,18 @@ namespace CrossyRoad.Player
         {
             (_input = new CrossyRoadInput()).PlayerInput.Enable();
             _input.PlayerInput.AddCallbacks(this);
+            KillPlayer += OnPlayerKilled;
+        }
+
+        private async void OnPlayerKilled()
+        {
+            if (_dead) return;
+            Debug.Log("Heavy is dead?");
+            _dead = true;
+            _explosion.SetActive(true);
+
+            await UniTask.Delay(200);
+            _rendererAnimator.SetTrigger(_deathTriggerId);
         }
 
         // Update is called once per frame
@@ -54,7 +80,7 @@ namespace CrossyRoad.Player
 
         public void OnJump(InputAction.CallbackContext ctx)
         {
-            if (ctx.performed) return;
+            if (!ctx.performed || _dead) return;
             Jump().Forget();
         }
 

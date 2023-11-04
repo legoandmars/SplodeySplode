@@ -15,7 +15,6 @@ Shader "RogueNoodle/GBPalette"
 	{
 		Tags{ "RenderType" = "Opaque"  "Queue" = "Geometry+0" "IsEmissive" = "true"  }
 		Cull Back
-				Blend One OneMinusSrcAlpha
 		CGPROGRAM
 		#pragma target 3.0
 		#pragma surface surf Unlit keepalpha addshadow fullforwardshadows

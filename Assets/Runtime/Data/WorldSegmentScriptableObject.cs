@@ -8,6 +8,7 @@ namespace CrossyRoad.Data
     {
         public int MinAmount = 1;
         public int MaxAmount = 1;
+        public CarType CarType = CarType.None;
         public string Name;
         public float Weight = 1f;
         public List<WorldSegment> Segments;

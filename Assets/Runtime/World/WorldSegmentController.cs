@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using AuraTween;
+using CrossyRoad.Behaviour;
 using CrossyRoad.Data;
 using UnityEngine;
 
@@ -7,6 +9,12 @@ namespace CrossyRoad.World
 {
     public class WorldSegmentController : MonoBehaviour
     {
+        [SerializeField]
+        private TweenManager _tweenManager = null!;
+
+        [SerializeField]
+        private CarPool _carPool = null!;
+
         [SerializeField]
         private List<WorldSegmentScriptableObject> _worldSegments = new();
 
@@ -103,6 +111,13 @@ namespace CrossyRoad.World
                 var segment = SpawnRandomWorldSegment(_worldSegments[_worldSegmentTypeIndex]);
                 segment.transform.SetParent(_worldSegmentContainer);
                 segment.transform.localPosition = new Vector3(_currentWorldSegmentIndex, 0, 0);
+                
+                var carBehaviour = segment.GetComponent<RoadCarBehaviour>();
+                if (carBehaviour != null) // todo do other checks first to not waste performance
+                {
+                    carBehaviour.SetPool(_carPool);
+                }
+                
                 _spawnedWorldSegments.Add(segment);
 
                 if (_worldSegmentTypeIndex == 1) //hardcoded road lol
