@@ -85,11 +85,12 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EmissionScaleUI: 0
-    - _Fade: 1
+    - _Fade: 1.05
     - _Glossiness: 0.5
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
+    - _PaletteMove: 0
     - _Parallax: 0.02
     - _ResX: 160
     - _ResY: 144
