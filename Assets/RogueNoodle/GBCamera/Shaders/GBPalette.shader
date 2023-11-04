@@ -5,6 +5,7 @@ Shader "RogueNoodle/GBPalette"
 		_RenderTexture("RenderTexture", 2D) = "white" {}
 		_Palette("Palette", 2D) = "white" {}
 		_Fade("Fade", Range( 0 , 5)) = 1
+		_PaletteMove("Shift Palette", Float) = 0 // only works if palette is repeat instead of clamp.
 		[HideInInspector] _texcoord( "", 2D ) = "white" {}
 		[HideInInspector] __dirty( "", Int ) = 1
 	}
@@ -25,6 +26,7 @@ Shader "RogueNoodle/GBPalette"
 		uniform sampler2D _RenderTexture;
 		uniform float4 _RenderTexture_ST;
 		uniform float _Fade;
+		uniform float _PaletteMove;
 
 		inline half4 LightingUnlit( SurfaceOutput s, half3 lightDir, half atten )
 		{
@@ -35,7 +37,7 @@ Shader "RogueNoodle/GBPalette"
 		{
 			float2 uv_RenderTexture = i.uv_texcoord * _RenderTexture_ST.xy + _RenderTexture_ST.zw;
 			float lerpResult4 = lerp( tex2D( _RenderTexture, uv_RenderTexture ).r , 0.0 , ( 1.0 - _Fade ));
-			float2 appendResult3 = (float2(lerpResult4 , lerpResult4));
+			float2 appendResult3 = (float2(lerpResult4  + _PaletteMove, lerpResult4));
 			o.Emission = tex2D( _Palette, appendResult3 ).rgb;
 			o.Alpha = 1;
 		}
