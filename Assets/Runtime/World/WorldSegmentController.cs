@@ -11,6 +11,9 @@ namespace CrossyRoad.World
         private List<WorldSegmentScriptableObject> _worldSegments = new();
 
         [SerializeField]
+        private GameObject _roadSeperator = null!;
+        
+        [SerializeField]
         private Transform _worldSegmentContainer = null!;
 
         [SerializeField]
@@ -24,7 +27,8 @@ namespace CrossyRoad.World
         
         private int _worldSegmentTypeIndex = 0;
         private int _remainingWorldSegmentsUntilNewTypeNeeded = 8; // always start us off with some grass!
-
+        private bool _lastWasRoad = false;
+        
         // TODO Pool if time had it will massively increase performance
         private List<GameObject> _spawnedWorldSegments = new();
         
@@ -86,6 +90,7 @@ namespace CrossyRoad.World
                     if (_currentWorldSegmentIndex != 0)
                     {
                         // make lower odds of rerolling into the same segment (it should still be possible)
+                        // TODO: Short circuit when it's over like 10 to avoid making the game unplayable lol
                         weights[_worldSegmentTypeIndex] *= 0.25f;
                     }
 
@@ -99,7 +104,16 @@ namespace CrossyRoad.World
                 segment.transform.SetParent(_worldSegmentContainer);
                 segment.transform.localPosition = new Vector3(_currentWorldSegmentIndex, 0, 0);
                 _spawnedWorldSegments.Add(segment);
+
+                if (_worldSegmentTypeIndex == 1) //hardcoded road lol
+                {
+                    if (_lastWasRoad)
+                    {
+                        Instantiate(_roadSeperator, segment.transform, false);
+                    }
+                }
                 
+                _lastWasRoad = _worldSegmentTypeIndex == 1;
                 _currentWorldSegmentIndex += 1;
                 _remainingWorldSegmentsUntilNewTypeNeeded -= 1;
             }
