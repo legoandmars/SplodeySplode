@@ -53,6 +53,7 @@ namespace CrossyRoad.World
             log.transform.localPosition = Vector3.zero;
             log.transform.localRotation = Quaternion.identity;
             log.SetExplodedState(false);
+            log.ExplosionImminent = false;
             log.gameObject.SetActive(true);
         }
 
@@ -69,14 +70,18 @@ namespace CrossyRoad.World
             //car.transform.SetParent(parent);
             log.transform.position = startPosition;
             
-            await _tweenManager.Run(startPosition, endPosition, log.Speed,
-                (t) =>
+            // ExplosionImminent
+            await _tweenManager.Run(0, 1, log.Speed, (t) =>
+            {
+                var timeRemaining = log.Speed - (t * log.Speed);
+                if (timeRemaining < 1.5f)
                 {
-                    if (log != null && !log.Disabled) log.transform.position = t;
-                }, Easer.Linear);
+                    log.ExplosionImminent = true;
+                }
+                log.transform.position = new Vector3(log.transform.position.x, log.transform.position.y, Mathf.Lerp(startPosition.z, endPosition.z, t));
+            }, Easer.Linear);
 
             if (log == null) return;
-            Debug.Log(log.Speed);
             log.Animator.SetTrigger(_explodeTriggerId);
             log.SetExplodedState(true);
             await UniTask.Delay(1000);

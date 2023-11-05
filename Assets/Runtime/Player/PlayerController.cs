@@ -27,6 +27,9 @@ namespace CrossyRoad.Player
         private Animator _playerAnimator = null!;
         
         [SerializeField]
+        private Animator _warningSymbolAnimator = null!;
+
+        [SerializeField]
         private Animator _rendererAnimator = null!;
 
         [SerializeField]
@@ -62,7 +65,8 @@ namespace CrossyRoad.Player
         private bool _jumping = false;
         private bool _dead = false;
         private bool _onWater = false;
-
+        private bool _warningShowing = false;
+        
         private int _maxReachedTile = 0;
         private int _currentTile = 0;
         private int _currentZTile = 0;
@@ -83,6 +87,8 @@ namespace CrossyRoad.Player
         
         private int _jumpTriggerId = Animator.StringToHash("Jump");
         private int _deathTriggerId = Animator.StringToHash("Death");
+        private int _warningTriggerId = Animator.StringToHash("Warning");
+        private int _cancelWarningTriggerId = Animator.StringToHash("CancelWarning");
 
         private int _finishJumpTriggerId = Animator.StringToHash("FinishMoving");
         private int _jumpAnimationId = Animator.StringToHash("Move");
@@ -102,6 +108,7 @@ namespace CrossyRoad.Player
             // move it out of the player so if the player still has velocity it won't move
             _explosion.transform.SetParent(null);
             _explosion.SetActive(true);
+            _warningSymbolAnimator.gameObject.SetActive(false);
             
             await UniTask.Delay(500);
             _rendererAnimator.SetTrigger(_deathTriggerId);
@@ -122,6 +129,31 @@ namespace CrossyRoad.Player
                     OnPlayerKilled();
                 }
             }*/
+            if (_activeLog != null && _activeLog.gameObject.activeSelf)
+            {
+                Debug.Log(_warningShowing);
+                if (_activeLog.ExplosionImminent && !_warningShowing)
+                {
+                    _warningShowing = true;
+                    _warningSymbolAnimator.ResetTrigger(_cancelWarningTriggerId);
+                    _warningSymbolAnimator.SetTrigger(_warningTriggerId);
+                }
+                else if(!_activeLog.ExplosionImminent && _warningShowing)
+                {
+                    Debug.Log("CANCELING EXCLAMATION");
+                    _warningShowing = false;
+                    _warningSymbolAnimator.ResetTrigger(_warningTriggerId);
+                    _warningSymbolAnimator.SetTrigger(_cancelWarningTriggerId);
+                }
+            } 
+            else if (_warningShowing)
+            {
+                Debug.Log("CANCELING EXCLAMATION");
+                _warningShowing = false;
+                _warningSymbolAnimator.ResetTrigger(_warningTriggerId);
+                _warningSymbolAnimator.SetTrigger(_cancelWarningTriggerId);
+            }
+            
             if(!_dead && _onWater && !_jumping && _activeLog != null && _activeLog.gameObject.activeSelf)
             {
                 if (_activeLog.Exploded)
@@ -190,6 +222,7 @@ namespace CrossyRoad.Player
             }
             
             _jumping = true;
+            _activeLog = null;
             
             _playerAnimator.SetTrigger(_jumpTriggerId);
             

@@ -262,7 +262,7 @@ GameObject:
   - component: {fileID: 4155243883994684980}
   - component: {fileID: 4935149239611534160}
   - component: {fileID: 1618824758213016526}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShortCar
   m_TagString: Untagged
   m_Icon: {fileID: 0}

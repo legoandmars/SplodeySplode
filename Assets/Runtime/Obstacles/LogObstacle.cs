@@ -7,7 +7,8 @@ namespace CrossyRoad.Obstacles
     {
         public bool Disabled = false;
         public bool Exploded = false;
-
+        public bool ExplosionImminent = false;
+        
         [SerializeField]
         public float Speed = 1f;
 
