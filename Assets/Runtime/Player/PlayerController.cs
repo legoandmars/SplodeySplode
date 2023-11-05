@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using AuraTween;
 using CrossyRoad.Audio;
 using CrossyRoad.Behaviour;
@@ -8,6 +9,7 @@ using CrossyRoad.Input;
 using CrossyRoad.Score;
 using CrossyRoad.World;
 using Cysharp.Threading.Tasks;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -42,6 +44,9 @@ namespace CrossyRoad.Player
         private ScoreController _scoreController = null!;
 
         [SerializeField]
+        private LogCollisionController _logCollisionController = null!;
+
+        [SerializeField]
         private AudioPool _audioPool = null!;
 
         [SerializeField]
@@ -55,10 +60,15 @@ namespace CrossyRoad.Player
         private CrossyRoadInput _input = null!;
         private bool _jumping = false;
         private bool _dead = false;
+        private bool _onWater = false;
 
         private int _maxReachedTile = 0;
         private int _currentTile = 0;
         private int _currentZTile = 0;
+
+        [CanBeNull] 
+        private Transform _activeLog = null;
+        private float _logZOffset = 0;
         
         [SerializeField]
         private int _maxBackwardsJumps = 3;
@@ -102,7 +112,19 @@ namespace CrossyRoad.Player
         // Update is called once per frame
         void Update()
         {
-            // Debug.Log(_playerVisualsTransform.position);
+            /*if (!_dead && _onWater && !_jumping)
+            {
+                if (_logCollisionController.PlayerIsOnWaterWithoutLog(_currentTile))
+                {
+                    Debug.Log("Killed on a log!");
+                    OnPlayerKilled();
+                }
+            }*/
+            if(!_dead && _onWater && !_jumping && _activeLog != null && _activeLog.gameObject.activeSelf)
+            {
+                // follow the log!
+                _playerTransform.position = new Vector3(_playerTransform.position.x, _playerTransform.position.y, _activeLog.position.z - _logZOffset);
+            }
         }
 
         public void OnJump(InputAction.CallbackContext ctx)
@@ -170,14 +192,76 @@ namespace CrossyRoad.Player
                 _tweenManager.Run(_currentTile, _currentTile + 1, _jumpDuration, value => _cameraTransform.localPosition = new Vector3(value, _cameraTransform.localPosition.y, _cameraTransform.localPosition.z), Easer.FastLinear, this);
             }
 
-            await _tweenManager.Run(new Vector3(_currentTile, 1, _currentZTile), new Vector3(_currentTile + xAdd, 1, _currentZTile + zAdd), _jumpDuration, value => _playerTransform.localPosition = value, Easer.FastLinear, this);
+            var tempIsOnWater = _logCollisionController.PlayerIsOnWater(_currentTile + 1);
+
+            if (!tempIsOnWater && _onWater)
+            {
+                // transitioning from water to land, need to do some currentTile math to regain our bearings
+                _currentZTile = Mathf.Clamp((int)Math.Round(_playerTransform.localPosition.z, 0), -_maxLeftJumps, _maxRightJumps);
+                await _tweenManager.Run(
+                    new Vector3(_currentTile, 1, _currentZTile), 
+                    new Vector3(_currentTile + xAdd, 1, _currentZTile + zAdd), 
+                    _jumpDuration, 
+                    value => _playerTransform.localPosition = value, 
+                    Easer.FastLinear, 
+                    this);
+            }
+            else if (tempIsOnWater && !_onWater)
+            {
+                // transitioning from land to water, normal movement should be fine
+                await _tweenManager.Run(
+                    new Vector3(_currentTile, 1, _currentZTile), 
+                    new Vector3(_currentTile + xAdd, 1, _currentZTile + zAdd), 
+                    _jumpDuration, 
+                    value => _playerTransform.localPosition = value, 
+                    Easer.FastLinear, 
+                    this);
+            }
+            else if (tempIsOnWater && _onWater)
+            {
+                // water to water, do some special math
+                await _tweenManager.Run(
+                    new Vector3(_currentTile, 1, _playerTransform.localPosition.z), 
+                    new Vector3(_currentTile + xAdd, 1, _playerTransform.localPosition.z + zAdd), 
+                    _jumpDuration, 
+                    value => _playerTransform.localPosition = value, 
+                    Easer.FastLinear, 
+                    this);
+            }
+            else
+            {
+                await _tweenManager.Run(
+                    new Vector3(_currentTile, 1, _currentZTile), 
+                    new Vector3(_currentTile + xAdd, 1, _currentZTile + zAdd), 
+                    _jumpDuration, 
+                    value => _playerTransform.localPosition = value, 
+                    Easer.FastLinear, 
+                    this);
+            }
 
             if (_dead) return;
             _currentTile += xAdd;
             _currentZTile += zAdd;
             if (_currentTile > _maxReachedTile) _maxReachedTile = _currentTile;
-            
             Debug.Log($"Current tiles: {_currentTile}, {_currentZTile}");
+
+            _onWater = _logCollisionController.PlayerIsOnWater(_currentTile);
+            // kill if on water w/o log
+            if (_onWater && _logCollisionController.PlayerIsOnWaterWithoutLog(_currentTile))
+            {
+                Debug.Log("Killed on a log!");
+                OnPlayerKilled();
+                return;
+            }
+            else if (_onWater)
+            {
+                // we're on a log, bind the player's movement to it
+                // hopefully this picks the right log ig
+                var firstLog = LogCollisionController.ActiveLogs.First();
+                _activeLog = firstLog.transform;
+                _logZOffset = firstLog.transform.position.z - _playerTransform.transform.position.z;
+            }
+            
             _scoreController.UpdateScore(_currentTile);
             _jumping = false;
         }

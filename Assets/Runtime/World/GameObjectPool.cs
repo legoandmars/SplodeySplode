@@ -1,4 +1,5 @@
-﻿using AuraTween;
+﻿using System;
+using AuraTween;
 using CrossyRoad.Behaviour;
 using CrossyRoad.Obstacles;
 using Cysharp.Threading.Tasks;
@@ -54,6 +55,19 @@ namespace CrossyRoad.World
         void OnDestroyPoolObject(GameObject pooledObject)
         {
             Destroy(pooledObject.gameObject);
+        }
+
+        public void ReleaseWhileRemovingCoordinates(GameObject pooledObject)
+        {
+            var coords = ((int)pooledObject.transform.position.x, (int)pooledObject.transform.position.z);
+            if (ObstacleCoordinatesController.ExistingCoordinates.Contains(coords))
+            {
+                ObstacleCoordinatesController.ExistingCoordinates.Remove(coords);
+            }
+            else
+            {
+                Debug.Log($"FAILED TO REMOVE OBJECT AT COORDINATES!!!! {coords}");
+            }
         }
     }
 }

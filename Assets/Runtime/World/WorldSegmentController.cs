@@ -10,13 +10,16 @@ namespace CrossyRoad.World
     public class WorldSegmentController : MonoBehaviour
     {
         [SerializeField]
-        private TweenManager _tweenManager = null!;
+        private LogCollisionController _logCollisionController = null!;
 
         [SerializeField]
         private CarPool _carPool = null!;
         
         [SerializeField]
         private BombPool _bombPool = null!;
+
+        [SerializeField]
+        private LogPool _logPool = null!;
 
         [SerializeField]
         private GameObjectPool _treePool = null!;
@@ -40,6 +43,7 @@ namespace CrossyRoad.World
         
         private int _worldSegmentTypeIndex = 0;
         private int _remainingWorldSegmentsUntilNewTypeNeeded = 8; // always start us off with some grass!
+        private int _waterCount = 0;
         private bool _lastWasRoad = false;
         
         // TODO Pool if time had it will massively increase performance
@@ -114,6 +118,7 @@ namespace CrossyRoad.World
                 segment.transform.SetParent(_worldSegmentContainer);
                 segment.transform.localPosition = new Vector3(_currentWorldSegmentIndex, 0, 0);
                 
+                // really need to fix the performance on this
                 segment.GetComponent<RoadCarBehaviour>()?.SetPool(_carPool);
                 segment.GetComponent<BombGrassBehaviour>()?.SetPool(_bombPool);
                 segment.GetComponent<TreeBehaviour>()?.SetPool(_treePool);
@@ -127,7 +132,20 @@ namespace CrossyRoad.World
                         Instantiate(_roadSeperator, segment.transform, false);
                     }
                 }
-                
+
+                if (_worldSegmentTypeIndex == 3) // hardcoded water lol
+                {
+                    // make sure collision will get registered properly
+                    _logCollisionController.RegisterWaterIndex(_currentWorldSegmentIndex);
+                    var waterLogBehaviour = segment.GetComponent<WaterLogBehaviour>();
+
+                    if (waterLogBehaviour != null)
+                    {
+                        waterLogBehaviour.SetPool(_logPool);
+                        waterLogBehaviour.DirectionInverted = _waterCount % 2 != 0;
+                        _waterCount++;
+                    }
+                }
                 _lastWasRoad = _worldSegmentTypeIndex == 1;
                 _currentWorldSegmentIndex += 1;
                 _remainingWorldSegmentsUntilNewTypeNeeded -= 1;

@@ -65,9 +65,7 @@ namespace CrossyRoad.Behaviour
         {
             foreach (var tree in SpawnedTrees)
             {
-                if (tree != null) _treePool.Pool.Release(tree);
-                var coords = ((int)tree.transform.position.x, (int)tree.transform.position.z);
-                if (ObstacleCoordinatesController.ExistingCoordinates.Contains(coords)) ObstacleCoordinatesController.ExistingCoordinates.Remove(coords);
+                if (tree != null) _treePool.ReleaseWhileRemovingCoordinates(tree);
             }
         }
     }
