@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fbef6da23e94f1a8dced0538f8237f1, type: 3}
+  m_Name: BombGrass
+  m_EditorClassIdentifier: 
+  MinAmount: 1
+  MaxAmount: 4
+  CarType: 0
+  Name: Bomb Grass
+  Weight: 1
+  Segments:
+  - WeightedSpawnChance: 1
+    Prefab: {fileID: 4465774067253531434, guid: 1e17fe0ea95b2a54ca834ade04ba73fc, type: 3}

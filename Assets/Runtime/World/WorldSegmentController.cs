@@ -14,6 +14,12 @@ namespace CrossyRoad.World
 
         [SerializeField]
         private CarPool _carPool = null!;
+        
+        [SerializeField]
+        private BombPool _bombPool = null!;
+
+        [SerializeField]
+        private GameObjectPool _treePool = null!;
 
         [SerializeField]
         private List<WorldSegmentScriptableObject> _worldSegments = new();
@@ -108,12 +114,10 @@ namespace CrossyRoad.World
                 segment.transform.SetParent(_worldSegmentContainer);
                 segment.transform.localPosition = new Vector3(_currentWorldSegmentIndex, 0, 0);
                 
-                var carBehaviour = segment.GetComponent<RoadCarBehaviour>();
-                if (carBehaviour != null) // todo do other checks first to not waste performance
-                {
-                    carBehaviour.SetPool(_carPool);
-                }
-                
+                segment.GetComponent<RoadCarBehaviour>()?.SetPool(_carPool);
+                segment.GetComponent<BombGrassBehaviour>()?.SetPool(_bombPool);
+                segment.GetComponent<TreeBehaviour>()?.SetPool(_treePool);
+
                 _spawnedWorldSegments.Add(segment);
 
                 if (_worldSegmentTypeIndex == 1) //hardcoded road lol

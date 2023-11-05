@@ -43,7 +43,7 @@ namespace CrossyRoad.Behaviour
             await UniTask.Delay(TimeSpan.FromSeconds(Random.Range(0f, 5f)));
             while (enabled)
             {
-                Debug.Log("Spawning car.");
+                // Debug.Log("Spawning car.");
                 _carPool.SpawnCar(_startPosition, _endPosition, transform).Forget(); //awaiting this waits for the car to despawn, which we don't need 100%
                 await UniTask.Delay(TimeSpan.FromSeconds(Random.Range(_minTimeBetweenCars, _maxTimeBetweenCars)));
             }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AuraTween;
 using CrossyRoad.Audio;
+using CrossyRoad.Behaviour;
 using CrossyRoad.Input;
 using CrossyRoad.Score;
 using CrossyRoad.World;
@@ -127,27 +128,7 @@ namespace CrossyRoad.Player
             if (!ctx.performed || _dead) return;
             Move(-1, 0).Forget();
         }
-
-        private async UniTask Jump()
-        {
-            if (_jumping) return;
-            _jumping = true;
-            
-            _playerAnimator.SetTrigger(_jumpTriggerId);
-            
-            _audioPool.Play(_jumpAudioClips[Random.Range(0, _jumpAudioClips.Count)]);
-            
-            // await UniTask.NextFrame();
-            
-            await _tweenManager.Run(new Vector3(_currentTile, 1, 0), new Vector3(_currentTile + 1, 1, 0), _jumpDuration, value => _playerTransform.localPosition = value, Easer.FastLinear, this);
-
-            if (_dead) return;
-            _currentTile += 1;
-            Debug.Log($"Current tile: {_currentTile}");
-            _scoreController.UpdateScore(_currentTile);
-            _jumping = false;
-        }
-
+        
         private void PlayNotAllowedSound()
         {
             _audioPool.Play(_notAllowedAudioClips[Random.Range(0, _jumpAudioClips.Count)]);
@@ -164,6 +145,13 @@ namespace CrossyRoad.Player
             }
             if (_currentTile + xAdd < _maxReachedTile - _maxBackwardsJumps)
             {
+                PlayNotAllowedSound();
+                return;
+            }
+            if (ObstacleCoordinatesController.ExistingCoordinates.Contains((_currentTile + xAdd, _currentZTile + zAdd)))
+            {
+                Debug.Log("FOLLOWING HAS OBJECT:");
+                Debug.Log((_currentTile + xAdd, _currentZTile + zAdd));
                 PlayNotAllowedSound();
                 return;
             }
