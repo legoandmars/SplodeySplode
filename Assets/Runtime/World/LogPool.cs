@@ -1,4 +1,5 @@
-﻿using AuraTween;
+﻿using System;
+using AuraTween;
 using CrossyRoad.Behaviour;
 using CrossyRoad.Obstacles;
 using Cysharp.Threading.Tasks;
@@ -14,10 +15,11 @@ namespace CrossyRoad.World
         
         [SerializeField]
         private TweenManager _tweenManager = null!;
-        
+
+        private int _explodeTriggerId = Animator.StringToHash("Explode");
+
         IObjectPool<LogObstacle> m_Pool;
-        
-        
+
         public IObjectPool<LogObstacle> Pool
         {
             get
@@ -50,6 +52,7 @@ namespace CrossyRoad.World
         {
             log.transform.localPosition = Vector3.zero;
             log.transform.localRotation = Quaternion.identity;
+            log.SetExplodedState(false);
             log.gameObject.SetActive(true);
         }
 
@@ -71,7 +74,12 @@ namespace CrossyRoad.World
                 {
                     if (log != null && !log.Disabled) log.transform.position = t;
                 }, Easer.Linear);
-            
+
+            if (log == null) return;
+            Debug.Log(log.Speed);
+            log.Animator.SetTrigger(_explodeTriggerId);
+            log.SetExplodedState(true);
+            await UniTask.Delay(1000);
             // TODO Explode somewhere here
             /*await _tweenManager.Run(_startAlpha, 0f, _fadeDuration,
                 (t) =>

@@ -16,7 +16,7 @@ MonoBehaviour:
   MaxAmount: 3
   CarType: 0
   Name: Water
-  Weight: 5
+  Weight: 1
   Segments:
   - WeightedSpawnChance: 1
     Prefab: {fileID: 416516688217707432, guid: 60d8d9802975c9946acebdd0bce86229, type: 3}

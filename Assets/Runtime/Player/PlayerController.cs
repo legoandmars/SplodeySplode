@@ -6,6 +6,7 @@ using AuraTween;
 using CrossyRoad.Audio;
 using CrossyRoad.Behaviour;
 using CrossyRoad.Input;
+using CrossyRoad.Obstacles;
 using CrossyRoad.Score;
 using CrossyRoad.World;
 using Cysharp.Threading.Tasks;
@@ -67,8 +68,9 @@ namespace CrossyRoad.Player
         private int _currentZTile = 0;
 
         [CanBeNull] 
-        private Transform _activeLog = null;
+        private LogObstacle _activeLog = null;
         private float _logZOffset = 0;
+        private float _tweenedLogZOffset = 0;
         
         [SerializeField]
         private int _maxBackwardsJumps = 3;
@@ -122,8 +124,17 @@ namespace CrossyRoad.Player
             }*/
             if(!_dead && _onWater && !_jumping && _activeLog != null && _activeLog.gameObject.activeSelf)
             {
-                // follow the log!
-                _playerTransform.position = new Vector3(_playerTransform.position.x, _playerTransform.position.y, _activeLog.position.z - _logZOffset);
+                if (_activeLog.Exploded)
+                {
+                    // die of cringe   
+                    Debug.Log("Exploded on a log!");
+                    OnPlayerKilled();
+                }
+                else
+                {
+                    // follow the log!
+                    _playerTransform.position = new Vector3(_playerTransform.position.x, _playerTransform.position.y, _activeLog.transform.position.z - _tweenedLogZOffset);
+                }
             }
         }
 
@@ -219,14 +230,33 @@ namespace CrossyRoad.Player
             }
             else if (tempIsOnWater && _onWater)
             {
-                // water to water, do some special math
-                await _tweenManager.Run(
-                    new Vector3(_currentTile, 1, _playerTransform.localPosition.z), 
-                    new Vector3(_currentTile + xAdd, 1, _playerTransform.localPosition.z + zAdd), 
-                    _jumpDuration, 
-                    value => _playerTransform.localPosition = value, 
-                    Easer.FastLinear, 
-                    this);
+                if (zAdd == 0)
+                {
+                    // water to water, do some special math
+                    await _tweenManager.Run(
+                        new Vector3(_currentTile, 1, _playerTransform.localPosition.z), 
+                        new Vector3(_currentTile + xAdd, 1, _playerTransform.localPosition.z + zAdd), 
+                        _jumpDuration, 
+                        value => _playerTransform.localPosition = value, 
+                        Easer.FastLinear, 
+                        this);
+                }
+                else
+                {
+                    Debug.Log("WHAT");
+                    // water to water, do some special math
+                    await _tweenManager.Run(
+                        0, 
+                        zAdd, 
+                        _jumpDuration,
+                        value =>
+                        {
+                            _tweenedLogZOffset = _logZOffset - value;
+                            _playerTransform.position = new Vector3(_playerTransform.position.x, _playerTransform.position.y, _activeLog.transform.position.z - _tweenedLogZOffset);
+                        }, 
+                        Easer.FastLinear, 
+                        this);
+                }
             }
             else
             {
@@ -258,8 +288,9 @@ namespace CrossyRoad.Player
                 // we're on a log, bind the player's movement to it
                 // hopefully this picks the right log ig
                 var firstLog = LogCollisionController.ActiveLogs.First();
-                _activeLog = firstLog.transform;
+                _activeLog = firstLog;
                 _logZOffset = firstLog.transform.position.z - _playerTransform.transform.position.z;
+                _tweenedLogZOffset = _logZOffset;
             }
             
             _scoreController.UpdateScore(_currentTile);
