@@ -31,7 +31,6 @@ namespace CrossyRoad.World
         private int _idealChunksOnScreen = 3;
 
         private int _currentWorldSegmentIndex = -5;
-        private int _bestPlayerTile = 0;
         
         private int _worldSegmentTypeIndex = 0;
         private int _remainingWorldSegmentsUntilNewTypeNeeded = 8; // always start us off with some grass!
@@ -41,12 +40,9 @@ namespace CrossyRoad.World
         private List<GameObject> _spawnedWorldSegments = new();
         
         // TODO Make sure this won't break when moving left right or down and then back up. only do on new records
-        public void PlayerLocationUpdated(int playerWorldSegment)
+        public void ScoreUpdated(int playerWorldSegment)
         {
-            if (playerWorldSegment <= _bestPlayerTile) return;
-            _bestPlayerTile = playerWorldSegment;
-
-            if (_bestPlayerTile % _spawnChunkSize != 0) return;
+            if (playerWorldSegment % _spawnChunkSize != 0) return;
             // despawn last 10 from list
             foreach (var segment in _spawnedWorldSegments.Take(_spawnChunkSize))
             {

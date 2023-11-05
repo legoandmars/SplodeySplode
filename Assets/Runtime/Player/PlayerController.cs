@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using AuraTween;
 using CrossyRoad.Audio;
 using CrossyRoad.Input;
+using CrossyRoad.Score;
 using CrossyRoad.World;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 namespace CrossyRoad.Player
@@ -31,9 +33,9 @@ namespace CrossyRoad.Player
 
         [SerializeField]
         private TweenManager _tweenManager = null!;
-        
+
         [SerializeField]
-        private WorldSegmentController _worldSegmentController = null!;
+        private ScoreController _scoreController = null!;
 
         [SerializeField]
         private AudioPool _audioPool = null!;
@@ -67,9 +69,13 @@ namespace CrossyRoad.Player
             Debug.Log("Heavy is dead?");
             _dead = true;
             _explosion.SetActive(true);
-
-            await UniTask.Delay(200);
+            
+            await UniTask.Delay(500);
             _rendererAnimator.SetTrigger(_deathTriggerId);
+            await UniTask.Delay(1500);
+            
+            _scoreController.SaveHighScoreIfNeeded();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
         // Update is called once per frame
@@ -97,9 +103,10 @@ namespace CrossyRoad.Player
             
             await _tweenManager.Run(new Vector3(_currentTile, 1, 0), new Vector3(_currentTile + 1, 1, 0), _jumpDuration, value => _playerTransform.localPosition = value, Easer.FastLinear, this);
 
+            if (_dead) return;
             _currentTile += 1;
             Debug.Log($"Current tile: {_currentTile}");
-            _worldSegmentController.PlayerLocationUpdated(_currentTile);
+            _scoreController.UpdateScore(_currentTile);
             _jumping = false;
         }
     }

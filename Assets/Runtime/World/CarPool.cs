@@ -88,7 +88,7 @@ namespace CrossyRoad.World
                     if(text != null) text.alpha = t;
                 }, Easer.Linear);
 */
-            if (car != null) Pool.Release(car);
+            if (car != null && !car.Disabled) Pool.Release(car);
         }
     }
 }
