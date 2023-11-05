@@ -9,6 +9,7 @@ Shader "RogueNoodle/GBPalette"
 		_SecondaryPalette("Secondary Palette", 2D) = "white" {}
 		_Fade("Fade", Range( 0 , 5)) = 1
 		_PaletteMove("Shift Palette", Float) = 0 // only works if palette is repeat instead of clamp.
+		_BlackStrength("Mask Black Strength", Float) = 0 // only works if palette is repeat instead of clamp.
 		[HideInInspector] _texcoord( "", 2D ) = "white" {}
 		[HideInInspector] __dirty( "", Int ) = 1
 	}
@@ -32,6 +33,7 @@ Shader "RogueNoodle/GBPalette"
 		uniform sampler2D _SecondaryPaletteMask;
 		uniform float4 _RenderTexture_ST;
 		uniform float _Fade;
+		uniform float _BlackStrength;
 		uniform float _PaletteMove;
 
 		inline half4 LightingUnlit( SurfaceOutput s, half3 lightDir, half atten )
@@ -46,8 +48,11 @@ Shader "RogueNoodle/GBPalette"
 			float2 appendResult3 = (float2(lerpResult4  + _PaletteMove, lerpResult4));
 			float4 overlay = tex2D( _OverlayRenderTexture, uv_RenderTexture);
 			float4 secondaryPaletteMask = tex2D( _SecondaryPaletteMask, uv_RenderTexture);
+
+			float3 secondaryPalette = tex2D( _SecondaryPalette, appendResult3).rgb;
+			float3 lightenBy = 1 - secondaryPaletteMask.r; 
 			// o.Emission = tex2D( _Palette, appendResult3 ).rgb + overlay * overlay.a;
-			float3 palette = lerp(tex2D( _Palette, appendResult3).rgb, tex2D( _SecondaryPalette, appendResult3).rgb, secondaryPaletteMask.a);
+			float3 palette = lerp(tex2D( _Palette, appendResult3).rgb, tex2D( _SecondaryPalette, appendResult3 + float4(lightenBy / _BlackStrength, 0)).rgb, secondaryPaletteMask.a);
 			o.Emission = lerp(palette, overlay, overlay.a);
 			o.Alpha = 1;
 		}
