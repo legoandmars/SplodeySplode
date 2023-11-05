@@ -73,6 +73,14 @@ Material:
         m_Texture: {fileID: 8400000, guid: 1528acf246a19472fb2d7ada997fea94, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SecondaryPalette:
+        m_Texture: {fileID: 2800000, guid: 6ba03bbc006834c97bcf5d8019f2cb20, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SecondaryPaletteMask:
+        m_Texture: {fileID: 8400000, guid: 9e45e2b1bf36d644d85c7ede099cf5b9, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _node_9850:
         m_Texture: {fileID: 2800000, guid: b3fcd8f241ade4c0288809a6776c5632, type: 3}
         m_Scale: {x: 1, y: 1}
