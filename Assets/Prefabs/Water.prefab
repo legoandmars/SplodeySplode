@@ -113,6 +113,6 @@ MonoBehaviour:
   DirectionInverted: 0
   _startInstantly: 0
   HasShortBombLogs: 0
-  _logHeight: 0.341
+  _logHeight: 0.348
   _minTimeBetweenLogs: 2
   _maxTimeBetweenLogs: 3.4
