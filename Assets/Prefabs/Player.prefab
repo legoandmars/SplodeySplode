@@ -158,6 +158,7 @@ MonoBehaviour:
   _warningSymbolAnimator: {fileID: 6087809726565857478}
   _rendererAnimator: {fileID: 0}
   _playerTransform: {fileID: 6087809726471166469}
+  _visualsTransform: {fileID: 6087809728181678398}
   _cameraTransform: {fileID: 0}
   _explosion: {fileID: 1638565075846448470}
   _tweenManager: {fileID: 0}

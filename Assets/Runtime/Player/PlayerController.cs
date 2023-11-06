@@ -34,7 +34,10 @@ namespace CrossyRoad.Player
 
         [SerializeField]
         private Transform _playerTransform = null!;
-        
+
+        [SerializeField]
+        private Transform _visualsTransform = null!;
+
         [SerializeField]
         private Transform _cameraTransform = null!;
         
@@ -69,6 +72,7 @@ namespace CrossyRoad.Player
         private int _currentTile = 0;
 
         private float _jumpDuration = 0.333f / 1.4f;
+        private float _turnDuration = 0.1f;
 
         private CrossyRoadInput _input = null!;
         private bool _jumping = false;
@@ -217,6 +221,16 @@ namespace CrossyRoad.Player
         {
             _audioPool.Play(_notAllowedAudioClips[Random.Range(0, _jumpAudioClips.Count)]);
         }
+
+        private Quaternion DirectionFromAdds(int xAdd, int zAdd)
+        {
+            if (xAdd == 1) return Quaternion.Euler(0, 0, 0);
+            else if (xAdd == -1) return Quaternion.Euler(0, 180, 0);
+            else if (zAdd == 1) return Quaternion.Euler(0, -90, 0);
+            else if (zAdd == -1) return Quaternion.Euler(0, 90, 0);
+            
+            return Quaternion.identity;
+        }
         
         private async UniTask Move(int xAdd, int zAdd)
         {
@@ -261,6 +275,13 @@ namespace CrossyRoad.Player
             }
 
             // we can run the "turn" tween here if necessary
+            var currentDirection = DirectionFromAdds(xAdd, zAdd);
+            if (currentDirection != _lastDirection)
+            {
+                // do a tween
+                _tweenManager.Run(_lastDirection, currentDirection, _turnDuration, value => _visualsTransform.localRotation = value, Easer.FastLinear, this);
+                _lastDirection = currentDirection;
+            }
             
             var tempIsOnWater = _logCollisionController.PlayerIsOnWater(_currentTile + 1);
 

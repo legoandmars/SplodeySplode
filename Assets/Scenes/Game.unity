@@ -2477,6 +2477,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _defaultTweenCapacity: 100
   _timeSource: 0
+--- !u!4 &2099955149 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6087809728181678398, guid: 72db89587c159f84ebd89ea4b550fe8c, type: 3}
+  m_PrefabInstance: {fileID: 6087809728099044541}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6087809728099044541
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2500,6 +2505,10 @@ PrefabInstance:
       propertyPath: _rendererAnimator
       value: 
       objectReference: {fileID: 1890645192}
+    - target: {fileID: 6087809726471166468, guid: 72db89587c159f84ebd89ea4b550fe8c, type: 3}
+      propertyPath: _visualsTransform
+      value: 
+      objectReference: {fileID: 2099955149}
     - target: {fileID: 6087809726471166468, guid: 72db89587c159f84ebd89ea4b550fe8c, type: 3}
       propertyPath: _logCollisionController
       value: 
@@ -2551,6 +2560,18 @@ PrefabInstance:
     - target: {fileID: 6087809726471166475, guid: 72db89587c159f84ebd89ea4b550fe8c, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 6087809728181678398, guid: 72db89587c159f84ebd89ea4b550fe8c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6087809728181678398, guid: 72db89587c159f84ebd89ea4b550fe8c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6087809728181678398, guid: 72db89587c159f84ebd89ea4b550fe8c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 72db89587c159f84ebd89ea4b550fe8c, type: 3}
