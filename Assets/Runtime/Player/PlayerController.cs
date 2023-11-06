@@ -85,6 +85,7 @@ namespace CrossyRoad.Player
         private int _currentZTile = 0;
 
         private Quaternion _lastDirection = Quaternion.identity;
+        private Tween? _activeJumpTween = null;
         
         [CanBeNull] 
         private LogObstacle _activeLog = null;
@@ -129,6 +130,8 @@ namespace CrossyRoad.Player
             // move it out of the player so if the player still has velocity it won't move
             _explosion.transform.SetParent(null);
             _explosion.SetActive(true);
+            _playerAnimator.SetTrigger(_deathTriggerId);
+            _activeJumpTween?.Cancel();
             _warningSymbolAnimator.gameObject.SetActive(false);
             
             await UniTask.Delay(500);
@@ -289,43 +292,46 @@ namespace CrossyRoad.Player
             {
                 // transitioning from water to land, need to do some currentTile math to regain our bearings
                 _currentZTile = Mathf.Clamp((int)Math.Round(_playerTransform.localPosition.z, 0), -_maxLeftJumps, _maxRightJumps);
-                await _tweenManager.Run(
+                _activeJumpTween = _tweenManager.Run(
                     new Vector3(_currentTile, 1, _currentZTile), 
                     new Vector3(_currentTile + xAdd, 1, _currentZTile + zAdd), 
                     _jumpDuration, 
                     value => _playerTransform.localPosition = value, 
                     Easer.FastLinear, 
                     this);
+                await _activeJumpTween.Value;
             }
             else if (tempIsOnWater && !_onWater)
             {
                 // transitioning from land to water, normal movement should be fine
-                await _tweenManager.Run(
+                _activeJumpTween = _tweenManager.Run(
                     new Vector3(_currentTile, 1, _currentZTile), 
                     new Vector3(_currentTile + xAdd, 1, _currentZTile + zAdd), 
                     _jumpDuration, 
                     value => _playerTransform.localPosition = value, 
                     Easer.FastLinear, 
                     this);
+                await _activeJumpTween.Value;
             }
             else if (tempIsOnWater && _onWater)
             {
                 if (zAdd == 0)
                 {
                     // water to water, do some special math
-                    await _tweenManager.Run(
+                    _activeJumpTween = _tweenManager.Run(
                         new Vector3(_currentTile, 1, _playerTransform.localPosition.z), 
                         new Vector3(_currentTile + xAdd, 1, _playerTransform.localPosition.z + zAdd), 
                         _jumpDuration, 
                         value => _playerTransform.localPosition = value, 
                         Easer.FastLinear, 
                         this);
+                    await _activeJumpTween.Value;
                 }
                 else
                 {
                     _logJumping = true;
                     // specifically log to log
-                    await _tweenManager.Run(
+                    _activeJumpTween = _tweenManager.Run(
                         0, 
                         zAdd, 
                         _jumpDuration,
@@ -335,17 +341,19 @@ namespace CrossyRoad.Player
                         }, 
                         Easer.FastLinear, 
                         this);
+                    await _activeJumpTween.Value;
                 }
             }
             else
             {
-                await _tweenManager.Run(
+                _activeJumpTween = _tweenManager.Run(
                     new Vector3(_currentTile, 1, _currentZTile), 
                     new Vector3(_currentTile + xAdd, 1, _currentZTile + zAdd), 
                     _jumpDuration, 
                     value => _playerTransform.localPosition = value, 
                     Easer.FastLinear, 
                     this);
+                await _activeJumpTween.Value;
             }
 
             _logJumping = false;
