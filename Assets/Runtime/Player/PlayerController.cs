@@ -22,6 +22,7 @@ namespace CrossyRoad.Player
     {
         // kinda gross but it's gonna take too long to do this nice lol
         public static Action? KillPlayer;
+        public static Action? FakeKillPlayer;
         
         [SerializeField]
         private Animator _playerAnimator = null!;
@@ -114,14 +115,32 @@ namespace CrossyRoad.Player
             (_input = new CrossyRoadInput()).PlayerInput.Enable();
             _input.PlayerInput.AddCallbacks(this);
             KillPlayer += OnPlayerKilled;
+            FakeKillPlayer += ForcePlayerTransition;
         }
 
         private void OnDestroy()
         {
             _input.PlayerInput.RemoveCallbacks(this);
             KillPlayer -= OnPlayerKilled;
+            FakeKillPlayer -= ForcePlayerTransition;
         }
 
+        public async void ForcePlayerTransition()
+        {
+            _dead = true;
+            Debug.Log("fake transition...");
+            // move it out of the player so if the player still has velocity it won't move
+            _explosion.transform.SetParent(null);
+            _explosion.SetActive(true);
+            // _playerAnimator.SetTrigger(_deathTriggerId);
+            // _activeJumpTween?.Cancel();
+            // _warningSymbolAnimator.gameObject.SetActive(false);
+            
+            await UniTask.Delay(500);
+            _rendererAnimator.SetTrigger(_deathTriggerId);
+            await UniTask.Delay(2600);
+        }
+        
         private async void OnPlayerKilled()
         {
             if (_dead) return;
@@ -286,7 +305,7 @@ namespace CrossyRoad.Player
                 _lastDirection = currentDirection;
             }
             
-            var tempIsOnWater = _logCollisionController.PlayerIsOnWater(_currentTile + 1);
+            var tempIsOnWater = _logCollisionController.PlayerIsOnWater(_currentTile + xAdd);
 
             if (!tempIsOnWater && _onWater)
             {

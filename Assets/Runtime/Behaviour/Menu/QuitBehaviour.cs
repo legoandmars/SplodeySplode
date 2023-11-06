@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using CrossyRoad.Player;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -10,7 +11,8 @@ namespace CrossyRoad.Behaviour.Menu
         private async void OnTriggerEnter(Collider other)
         {
             Debug.Log("we quittin bois");
-            await UniTask.Delay(500);
+            PlayerController.FakeKillPlayer?.Invoke();
+            await UniTask.Delay(2600+500);
             // quit
 #if UNITY_EDITOR
             EditorApplication.isPlaying = false;

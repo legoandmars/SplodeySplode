@@ -53,8 +53,8 @@ Shader "RogueNoodle/GBPalette"
 
 			float3 lightenBy = 1 - lerp(1, secondaryPaletteMask.r, clampedFade); 
 			// o.Emission = tex2D( _Palette, appendResult3 ).rgb + overlay * overlay.a;
-			float3 palette = lerp(tex2D( _Palette, appendResult3).rgb, tex2D( _SecondaryPalette, appendResult3 + float4(lightenBy / _BlackStrength, 0)).rgb, lerp(0, secondaryPaletteMask.a, clampedFade));
-			o.Emission = lerp(palette, overlay, lerp(0, overlay.a, clampedFade));
+			float3 palette = lerp(tex2D( _Palette, appendResult3).rgb, tex2D( _SecondaryPalette, appendResult3 + float4(lightenBy / _BlackStrength, 0)).rgb, lerp(0, secondaryPaletteMask.a, pow(clampedFade, 2)));
+			o.Emission = lerp(palette, overlay, lerp(0, overlay.a, pow(clampedFade, 2.5)));
 			o.Alpha = 1;
 		}
 
