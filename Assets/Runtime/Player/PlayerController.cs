@@ -63,6 +63,7 @@ namespace CrossyRoad.Player
 
         private CrossyRoadInput _input = null!;
         private bool _jumping = false;
+        private bool _logJumping = false;
         private bool _dead = false;
         private bool _onWater = false;
         private bool _warningShowing = false;
@@ -131,7 +132,6 @@ namespace CrossyRoad.Player
             }*/
             if (_activeLog != null && _activeLog.gameObject.activeSelf)
             {
-                Debug.Log(_warningShowing);
                 if (_activeLog.ExplosionImminent && !_warningShowing)
                 {
                     _warningShowing = true;
@@ -154,8 +154,11 @@ namespace CrossyRoad.Player
                 _warningSymbolAnimator.SetTrigger(_cancelWarningTriggerId);
             }
             
-            if(!_dead && _onWater && !_jumping && _activeLog != null && _activeLog.gameObject.activeSelf)
+            if (!_dead && _onWater && _activeLog != null && _activeLog.gameObject.activeSelf)
             {
+                Debug.Log($"{_jumping}, {!_logJumping}");
+                if (_jumping && !_logJumping) return;
+                
                 if (_activeLog.Exploded)
                 {
                     // die of cringe   
@@ -222,7 +225,7 @@ namespace CrossyRoad.Player
             }
             
             _jumping = true;
-            _activeLog = null;
+           // _activeLog = null;
             
             _playerAnimator.SetTrigger(_jumpTriggerId);
             
@@ -276,8 +279,8 @@ namespace CrossyRoad.Player
                 }
                 else
                 {
-                    Debug.Log("WHAT");
-                    // water to water, do some special math
+                    _logJumping = true;
+                    // specifically log to log
                     await _tweenManager.Run(
                         0, 
                         zAdd, 
@@ -285,7 +288,6 @@ namespace CrossyRoad.Player
                         value =>
                         {
                             _tweenedLogZOffset = _logZOffset - value;
-                            _playerTransform.position = new Vector3(_playerTransform.position.x, _playerTransform.position.y, _activeLog.transform.position.z - _tweenedLogZOffset);
                         }, 
                         Easer.FastLinear, 
                         this);
@@ -302,6 +304,7 @@ namespace CrossyRoad.Player
                     this);
             }
 
+            _logJumping = false;
             if (_dead) return;
             _currentTile += xAdd;
             _currentZTile += zAdd;
@@ -324,6 +327,10 @@ namespace CrossyRoad.Player
                 _activeLog = firstLog;
                 _logZOffset = firstLog.transform.position.z - _playerTransform.transform.position.z;
                 _tweenedLogZOffset = _logZOffset;
+            }
+            else
+            {
+                _activeLog = null;
             }
             
             _scoreController.UpdateScore(_currentTile);

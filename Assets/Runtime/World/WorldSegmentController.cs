@@ -20,6 +20,9 @@ namespace CrossyRoad.World
 
         [SerializeField]
         private LogPool _logPool = null!;
+        
+        [SerializeField]
+        private LogPool _shortLogPool = null!;
 
         [SerializeField]
         private GameObjectPool _treePool = null!;
@@ -141,9 +144,16 @@ namespace CrossyRoad.World
 
                     if (waterLogBehaviour != null)
                     {
-                        waterLogBehaviour.SetPool(_logPool);
+                        waterLogBehaviour.SetPool(waterLogBehaviour.HasShortBombLogs ? _shortLogPool : _logPool);
                         waterLogBehaviour.DirectionInverted = _waterCount % 2 != 0;
                         _waterCount++;
+                    }
+                    
+                    // really fucked solution to fix a movement bug when moving into a tree from water
+                    for (int j = 0; j < 8; j++)
+                    {
+                        var coords = (_currentWorldSegmentIndex + 1, j - 4);
+                        if (!ObstacleCoordinatesController.DontSpawnCoordinates.Contains(coords)) ObstacleCoordinatesController.DontSpawnCoordinates.Add(coords);
                     }
                 }
                 _lastWasRoad = _worldSegmentTypeIndex == 1;

@@ -20,3 +20,5 @@ MonoBehaviour:
   Segments:
   - WeightedSpawnChance: 1
     Prefab: {fileID: 416516688217707432, guid: 60d8d9802975c9946acebdd0bce86229, type: 3}
+  - WeightedSpawnChance: 1
+    Prefab: {fileID: 416516688217707432, guid: 1892df73c780db245a834afc31d9f2d3, type: 3}

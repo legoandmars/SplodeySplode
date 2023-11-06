@@ -64,12 +64,12 @@ namespace CrossyRoad.World
             Destroy(log.gameObject);
         }
 
-        public async UniTask SpawnLog(Vector3 startPosition, Vector3 endPosition, Transform parent)
+        public async UniTask SpawnLog(Vector3 startPosition, Vector3 endPosition, bool inverted)
         {
             var log = Pool.Get();
             //car.transform.SetParent(parent);
             log.transform.position = startPosition;
-            
+            log.transform.rotation = Quaternion.Euler(0, inverted ? 180f : 0f, 0);
             // ExplosionImminent
             await _tweenManager.Run(0, 1, log.Speed, (t) =>
             {

@@ -10,6 +10,9 @@ namespace CrossyRoad.Behaviour
     public class WaterLogBehaviour : MonoBehaviour
     {
         public bool DirectionInverted = false;
+
+        [SerializeField]
+        public bool HasShortBombLogs = false;
         
         [SerializeField]
         private float _logHeight = 0f;
@@ -24,7 +27,7 @@ namespace CrossyRoad.Behaviour
         private Vector3 _startPosition;
         private Vector3 _endPosition;
 
-        private float _offsetToExplode = 4.5f;
+        private float _offsetToExplode = 4f;
         
         public void SetPool(LogPool logPool)
         {
@@ -41,7 +44,7 @@ namespace CrossyRoad.Behaviour
             
             _startPosition = new Vector3(transform.position.x, transform.position.y + _logHeight, directionalStartZ);
             _endPosition = new Vector3(transform.position.x, transform.position.y + _logHeight, directionalEndZ);
-
+            transform.rotation = Quaternion.Euler(0, DirectionInverted ? 180f : 0f, 0);
             SpawnLoop().AttachExternalCancellation(this.GetCancellationTokenOnDestroy()).Forget();
         }
 
@@ -52,7 +55,8 @@ namespace CrossyRoad.Behaviour
             while (enabled)
             {
                 // Debug.Log("Spawning car.");
-                _logPool.SpawnLog(_startPosition, _endPosition, transform).Forget(); //awaiting this waits for the car to despawn, which we don't need 100%
+                _logPool.SpawnLog(_startPosition, _endPosition, DirectionInverted).Forget(); //awaiting this waits for the car to despawn, which we don't need 100%
+                
                 await UniTask.Delay(TimeSpan.FromSeconds(Random.Range(_minTimeBetweenLogs, _maxTimeBetweenLogs)));
             }
         }
