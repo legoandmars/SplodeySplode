@@ -59,6 +59,15 @@ namespace CrossyRoad.Player
         [SerializeField]
         private List<AudioClip> _notAllowedAudioClips = new();
 
+        [SerializeField]
+        private bool ConstrainedToLeftRight = false;
+
+        [SerializeField]
+        private bool AllowedToMove = true;
+        
+        [SerializeField]
+        private int _currentTile = 0;
+
         private float _jumpDuration = 0.333f / 1.4f;
 
         private CrossyRoadInput _input = null!;
@@ -69,7 +78,6 @@ namespace CrossyRoad.Player
         private bool _warningShowing = false;
         
         private int _maxReachedTile = 0;
-        private int _currentTile = 0;
         private int _currentZTile = 0;
 
         [CanBeNull] 
@@ -99,6 +107,12 @@ namespace CrossyRoad.Player
             (_input = new CrossyRoadInput()).PlayerInput.Enable();
             _input.PlayerInput.AddCallbacks(this);
             KillPlayer += OnPlayerKilled;
+        }
+
+        private void OnDestroy()
+        {
+            _input.PlayerInput.RemoveCallbacks(this);
+            KillPlayer -= OnPlayerKilled;
         }
 
         private async void OnPlayerKilled()
@@ -220,6 +234,11 @@ namespace CrossyRoad.Player
             {
                 Debug.Log("FOLLOWING HAS OBJECT:");
                 Debug.Log((_currentTile + xAdd, _currentZTile + zAdd));
+                PlayNotAllowedSound();
+                return;
+            }
+            if (!AllowedToMove || (ConstrainedToLeftRight && xAdd != 0))
+            {
                 PlayNotAllowedSound();
                 return;
             }
