@@ -11,7 +11,7 @@ namespace CrossyRoad.Behaviour
         private float _speed = 1f;
         private void Update()
         {
-            _material.mainTextureOffset = new Vector2(0, Time.realtimeSinceStartup * _speed);
+            _material.mainTextureOffset = new Vector2(0.15f, Time.realtimeSinceStartup * _speed);
         }
     }
 }

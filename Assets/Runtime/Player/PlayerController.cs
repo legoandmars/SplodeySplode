@@ -80,6 +80,8 @@ namespace CrossyRoad.Player
         private int _maxReachedTile = 0;
         private int _currentZTile = 0;
 
+        private Quaternion _lastDirection = Quaternion.identity;
+        
         [CanBeNull] 
         private LogObstacle _activeLog = null;
         private float _logZOffset = 0;
@@ -258,6 +260,8 @@ namespace CrossyRoad.Player
                 _tweenManager.Run(_currentTile, _currentTile + 1, _jumpDuration, value => _cameraTransform.localPosition = new Vector3(value, _cameraTransform.localPosition.y, _cameraTransform.localPosition.z), Easer.FastLinear, this);
             }
 
+            // we can run the "turn" tween here if necessary
+            
             var tempIsOnWater = _logCollisionController.PlayerIsOnWater(_currentTile + 1);
 
             if (!tempIsOnWater && _onWater)
