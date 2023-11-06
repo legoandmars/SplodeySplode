@@ -11,6 +11,10 @@ namespace CrossyRoad.Behaviour
     {
         public bool DirectionInverted = false;
 
+        // for menu (demo purposes, etc)
+        [SerializeField]
+        private bool _startInstantly = false;
+        
         [SerializeField]
         public bool HasShortBombLogs = false;
         
@@ -51,7 +55,7 @@ namespace CrossyRoad.Behaviour
         private async UniTask SpawnLoop()
         {
             // random spawn delay to offset spawns and increase difficulty
-            await UniTask.Delay(TimeSpan.FromSeconds(Random.Range(0f, 5f)));
+            if(!_startInstantly) await UniTask.Delay(TimeSpan.FromSeconds(Random.Range(0f, 5f)));
             while (enabled)
             {
                 // Debug.Log("Spawning car.");
