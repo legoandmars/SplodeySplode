@@ -43,17 +43,18 @@ Shader "RogueNoodle/GBPalette"
 
 		void surf( Input i , inout SurfaceOutput o )
 		{
+			float clampedFade = min(_Fade, 1);
+			
 			float2 uv_RenderTexture = i.uv_texcoord * _RenderTexture_ST.xy + _RenderTexture_ST.zw;
 			float lerpResult4 = lerp( tex2D( _RenderTexture, uv_RenderTexture ).r , 0.0 , ( 1.0 - _Fade ));
 			float2 appendResult3 = (float2(lerpResult4  + _PaletteMove, lerpResult4));
 			float4 overlay = tex2D( _OverlayRenderTexture, uv_RenderTexture);
-			float4 secondaryPaletteMask = tex2D( _SecondaryPaletteMask, uv_RenderTexture);
+			float4 secondaryPaletteMask = tex2D(_SecondaryPaletteMask, uv_RenderTexture);
 
-			float3 secondaryPalette = tex2D( _SecondaryPalette, appendResult3).rgb;
-			float3 lightenBy = 1 - secondaryPaletteMask.r; 
+			float3 lightenBy = 1 - lerp(1, secondaryPaletteMask.r, clampedFade); 
 			// o.Emission = tex2D( _Palette, appendResult3 ).rgb + overlay * overlay.a;
-			float3 palette = lerp(tex2D( _Palette, appendResult3).rgb, tex2D( _SecondaryPalette, appendResult3 + float4(lightenBy / _BlackStrength, 0)).rgb, secondaryPaletteMask.a);
-			o.Emission = lerp(palette, overlay, overlay.a);
+			float3 palette = lerp(tex2D( _Palette, appendResult3).rgb, tex2D( _SecondaryPalette, appendResult3 + float4(lightenBy / _BlackStrength, 0)).rgb, lerp(0, secondaryPaletteMask.a, clampedFade));
+			o.Emission = lerp(palette, overlay, lerp(0, overlay.a, clampedFade));
 			o.Alpha = 1;
 		}
 

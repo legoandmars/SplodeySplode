@@ -136,7 +136,7 @@ namespace CrossyRoad.Player
             
             await UniTask.Delay(500);
             _rendererAnimator.SetTrigger(_deathTriggerId);
-            await UniTask.Delay(1500);
+            await UniTask.Delay(2600);
             
             _scoreController.SaveHighScoreIfNeeded();
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
