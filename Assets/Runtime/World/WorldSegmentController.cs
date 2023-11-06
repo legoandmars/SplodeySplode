@@ -16,6 +16,12 @@ namespace CrossyRoad.World
         private CarPool _carPool = null!;
         
         [SerializeField]
+        private CarPool _longCarPool = null!;
+        
+        [SerializeField]
+        private CarPool _shorterCarPool = null!;
+        
+        [SerializeField]
         private BombPool _bombPool = null!;
 
         [SerializeField]
@@ -122,7 +128,6 @@ namespace CrossyRoad.World
                 segment.transform.localPosition = new Vector3(_currentWorldSegmentIndex, 0, 0);
                 
                 // really need to fix the performance on this
-                segment.GetComponent<RoadCarBehaviour>()?.SetPool(_carPool);
                 segment.GetComponent<BombGrassBehaviour>()?.SetPool(_bombPool);
                 segment.GetComponent<TreeBehaviour>()?.SetPool(_treePool);
 
@@ -133,6 +138,23 @@ namespace CrossyRoad.World
                     if (_lastWasRoad)
                     {
                         Instantiate(_roadSeperator, segment.transform, false);
+                    }
+                    
+                    var roadCarBehaviour = segment.GetComponent<RoadCarBehaviour>();
+                    if (roadCarBehaviour != null)
+                    {
+                        if (roadCarBehaviour.CarType == CarType.Short)
+                        {
+                            roadCarBehaviour.SetPool(_carPool);
+                        }
+                        else if (roadCarBehaviour.CarType == CarType.Long)
+                        {
+                            roadCarBehaviour.SetPool(_longCarPool);
+                        }
+                        else if (roadCarBehaviour.CarType == CarType.Shorter)
+                        {
+                            roadCarBehaviour.SetPool(_shorterCarPool);
+                        }
                     }
                 }
 

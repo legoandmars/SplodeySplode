@@ -1,4 +1,5 @@
 ﻿using System;
+using CrossyRoad.Data;
 using CrossyRoad.Util;
 using CrossyRoad.World;
 using Cysharp.Threading.Tasks;
@@ -9,6 +10,8 @@ namespace CrossyRoad.Behaviour
 {
     public class RoadCarBehaviour : MonoBehaviour
     {
+        public CarType CarType = CarType.None;
+
         [SerializeField]
         private float _carHeight = 0.784f;
 

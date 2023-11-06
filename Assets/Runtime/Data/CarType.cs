@@ -7,6 +7,7 @@ namespace CrossyRoad.Data
     {
         None,
         Short, 
-        Long
+        Long,
+        Shorter
     }
 }
