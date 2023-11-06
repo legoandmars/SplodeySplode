@@ -45,7 +45,7 @@ namespace CrossyRoad.World
         private int _currentWorldSegmentIndex = -5;
         
         private int _worldSegmentTypeIndex = 0;
-        private int _remainingWorldSegmentsUntilNewTypeNeeded = 8; // always start us off with some grass!
+        private int _remainingWorldSegmentsUntilNewTypeNeeded = 7; // always start us off with some grass!
         private int _waterCount = 0;
         private bool _lastWasRoad = false;
         

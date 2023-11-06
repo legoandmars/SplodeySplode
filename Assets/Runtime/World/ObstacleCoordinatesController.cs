@@ -18,6 +18,11 @@ namespace CrossyRoad.World
             (3, 0),
             (4, 0),
             (5, 0),
+            (-1, 0), // for menu text (bottom two are for readability)
+            (-1, 1),
+            (-1, -1),
+            (-2, 0),
+            (-2, -1),
         };
 
         public void Awake()
@@ -31,6 +36,11 @@ namespace CrossyRoad.World
                 (3, 0),
                 (4, 0),
                 (5, 0),
+                (-1, 0), // for menu text (bottom three are for readability)
+                (-1, 1),
+                (-1, -1),
+                (-2, 0),
+                (-2, -1),
             };
         }
     }
