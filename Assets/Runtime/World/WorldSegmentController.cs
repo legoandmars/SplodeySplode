@@ -143,6 +143,8 @@ namespace CrossyRoad.World
                     var roadCarBehaviour = segment.GetComponent<RoadCarBehaviour>();
                     if (roadCarBehaviour != null)
                     {
+                        roadCarBehaviour.DirectionInverted = Random.Range(0, 2) == 1;
+
                         if (roadCarBehaviour.CarType == CarType.Short)
                         {
                             roadCarBehaviour.SetPool(_carPool);

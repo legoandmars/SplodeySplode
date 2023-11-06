@@ -10,6 +10,8 @@ namespace CrossyRoad.Behaviour
 {
     public class RoadCarBehaviour : MonoBehaviour
     {
+        public bool DirectionInverted = false;
+        
         public CarType CarType = CarType.None;
 
         [SerializeField]
@@ -34,8 +36,12 @@ namespace CrossyRoad.Behaviour
         {
             if (_carPool == null) return;
             
-            _startPosition = new Vector3(transform.position.x, transform.position.y + _carHeight, transform.position.z + Constants.RoadWidth / 2);
-            _endPosition = new Vector3(transform.position.x, transform.position.y + _carHeight, transform.position.z - Constants.RoadWidth / 2);
+            var halfRoadWidth = Constants.RoadWidth / 2;
+            var directionalStartZ = DirectionInverted ? transform.position.z - halfRoadWidth : transform.position.z + halfRoadWidth;
+            var directionalEndZ = DirectionInverted ? transform.position.z + halfRoadWidth : transform.position.z - halfRoadWidth;
+
+            _startPosition = new Vector3(transform.position.x, transform.position.y + _carHeight, directionalStartZ);
+            _endPosition = new Vector3(transform.position.x, transform.position.y + _carHeight, directionalEndZ);
             
             SpawnLoop().AttachExternalCancellation(this.GetCancellationTokenOnDestroy()).Forget();
         }
@@ -47,7 +53,7 @@ namespace CrossyRoad.Behaviour
             while (enabled)
             {
                 // Debug.Log("Spawning car.");
-                _carPool.SpawnCar(_startPosition, _endPosition, transform).Forget(); //awaiting this waits for the car to despawn, which we don't need 100%
+                _carPool.SpawnCar(_startPosition, _endPosition, DirectionInverted).Forget(); //awaiting this waits for the car to despawn, which we don't need 100%
                 await UniTask.Delay(TimeSpan.FromSeconds(Random.Range(_minTimeBetweenCars, _maxTimeBetweenCars)));
             }
         }
