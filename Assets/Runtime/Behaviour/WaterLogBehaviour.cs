@@ -27,6 +27,9 @@ namespace CrossyRoad.Behaviour
         [SerializeField]
         private float _maxTimeBetweenLogs = 2f;
         
+        [SerializeField]
+        private Transform _frontPlaneTransform = null!;
+
         private LogPool _logPool = null!;
         private Vector3 _startPosition;
         private Vector3 _endPosition;
@@ -49,6 +52,16 @@ namespace CrossyRoad.Behaviour
             _startPosition = new Vector3(transform.position.x, transform.position.y + _logHeight, directionalStartZ);
             _endPosition = new Vector3(transform.position.x, transform.position.y + _logHeight, directionalEndZ);
             transform.rotation = Quaternion.Euler(0, DirectionInverted ? 180f : 0f, 0);
+            if (_frontPlaneTransform == null)
+            {
+                Debug.Log("Front plane transform not set on prefab!");
+            }
+            else
+            {
+                _frontPlaneTransform.localPosition = new Vector3(DirectionInverted ? 0.45f : -0.45f, _frontPlaneTransform.localPosition.y, 0);
+                _frontPlaneTransform.localRotation = Quaternion.Euler(90, 0 , DirectionInverted ? -90f : 90f);
+            }
+
             SpawnLoop().AttachExternalCancellation(this.GetCancellationTokenOnDestroy()).Forget();
         }
 

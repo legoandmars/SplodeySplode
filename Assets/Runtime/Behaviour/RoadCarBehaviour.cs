@@ -22,6 +22,9 @@ namespace CrossyRoad.Behaviour
         
         [SerializeField]
         private float _maxTimeBetweenCars = 2f;
+
+        [SerializeField]
+        private Transform _frontPlaneTransform = null!;
         
         private CarPool _carPool = null!;
         private Vector3 _startPosition;
@@ -42,7 +45,15 @@ namespace CrossyRoad.Behaviour
 
             _startPosition = new Vector3(transform.position.x, transform.position.y + _carHeight, directionalStartZ);
             _endPosition = new Vector3(transform.position.x, transform.position.y + _carHeight, directionalEndZ);
-            
+            if (_frontPlaneTransform == null)
+            {
+                Debug.Log("Front plane transform not set on prefab!");
+            }
+            else
+            {
+                _frontPlaneTransform.localPosition = new Vector3(DirectionInverted ? 0.45f : -0.45f, _frontPlaneTransform.localPosition.y, 0);
+                _frontPlaneTransform.localRotation = Quaternion.Euler(90, 0 , DirectionInverted ? -90f : 90f);
+            }
             SpawnLoop().AttachExternalCancellation(this.GetCancellationTokenOnDestroy()).Forget();
         }
 
